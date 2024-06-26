@@ -35,6 +35,15 @@ def get_weather(city):
         return weather_info
     else:
         return {"Error": "City not found"}
+        
+def save_weather_to_db(city, weather_info):
+    db_data = {
+        'city': city,
+        'temperature': weather_info['Temperature'],
+        'description': weather_info['Weather Description']
+    }
+    requests.post('http://localhost:81/weather', json=db_data)
+
 
 def save_weather_to_s3(city, weather_info):
     bucket_name = 'weatherforecast'
