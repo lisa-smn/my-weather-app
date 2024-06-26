@@ -4,12 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #weather-info {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .weather-detail {
+            margin-bottom: 10px;
+        }
+        .weather-detail span {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>Weather App</h1>
     <form id="weather-form">
         <label for="city">Enter city name:</label>
-        <input type="text" id="city" name="city">
+        <input type="text" id="city" name="city" required>
         <button type="submit">Get Weather</button>
     </form>
     <div id="weather-info"></div>
@@ -30,7 +59,16 @@
             })
             .then(data => {
                 var weatherDiv = document.getElementById('weather-info');
-                weatherDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                weatherDiv.innerHTML = `
+                    <div class="weather-detail"><span>City:</span> ${data.name}</div>
+                    <div class="weather-detail"><span>Temperature:</span> ${data.main.temp} °C</div>
+                    <div class="weather-detail"><span>Feels Like:</span> ${data.main.feels_like} °C</div>
+                    <div class="weather-detail"><span>Humidity:</span> ${data.main.humidity}%</div>
+                    <div class="weather-detail"><span>Pressure:</span> ${data.main.pressure} hPa</div>
+                    <div class="weather-detail"><span>Weather:</span> ${data.weather[0].description}</div>
+                    <div class="weather-detail"><span>Wind Speed:</span> ${data.wind.speed} m/s</div>
+                    <div class="weather-detail"><span>Wind Direction:</span> ${data.wind.deg}°</div>
+                `;
             })
             .catch(error => {
                 var weatherDiv = document.getElementById('weather-info');

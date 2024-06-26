@@ -80,6 +80,36 @@ My Weather App is a web application that displays current weather information fo
 
 3. Use the S3 bucket URL to access the website.
 
+## API Endpoints
+
+### Weather API Endpoint
+
+- **URL**: `/weather`
+- **Method**: `POST`
+- **Parameters**: `city` (name of the city)
+- **Response**: JSON with weather information or error message
+
+### Example
+
+- **Request**:
+
+    ```bash
+    curl -X POST -F "city=Hamburg" http://localhost:5000/weather
+    ```
+
+- **Response**:
+
+    ```json
+    {
+        "Temperature": 20.5,
+        "Humidity": 60,
+        "Pressure": 1012,
+        "Weather Description": "clear sky",
+        "Wind Speed": 5.5,
+        "Timestamp": "2023-04-01T12:34:56Z"
+    }
+    ```
+
 
 ## License
 
