@@ -18,6 +18,7 @@ services:
     ports:
       - "81:5001"  # Map port 5001 of the container to port 81 of the host
     environment:
+      API_KEY: bb97533805fced5bb8e6af83e94dbee8
       DB_USER: admin
       DB_PASSWORD: my-weather-app-db
       DB_HOST: my-weather-app-db.cnla9t80uygd.us-east-1.rds.amazonaws.com

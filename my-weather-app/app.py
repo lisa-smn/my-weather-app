@@ -29,6 +29,9 @@ def get_weather(city):
             'Timestamp': datetime.utcnow().isoformat()
         }
         
+        # Speichern der Wetterdaten in der Datenbank
+        save_weather_to_db(city, weather_info)
+        
         # Speichern der Wetterdaten in AWS S3
         save_weather_to_s3(city, weather_info)
         
@@ -42,10 +45,15 @@ def save_weather_to_db(city, weather_info):
         'temperature': weather_info['Temperature'],
         'description': weather_info['Weather Description']
     }
-    requests.post('http://localhost:81/weather', json=db_data)
+    # Interner Port des Containers verwenden
+    response = requests.post('http://weather-data:5001/weather', json=db_data)
+    if response.status_code != 201:
+        print(f"Failed to save weather data to DB: {response.status_code} - {response.text}")
+
 
 
 def save_weather_to_s3(city, weather_info):
+    s3 = boto3.client('s3')
     bucket_name = 'weatherforecast'
     file_name = f"weather_data/{city}_{weather_info['Timestamp']}.json"
     
@@ -67,7 +75,8 @@ def index():
 
 @app.route('/weather', methods=['POST'])
 def weather():
-    city = request.form['city']
+    data = request.get_json()
+    city = data.get('city')
     weather_info = get_weather(city)
     return jsonify(weather_info)
 

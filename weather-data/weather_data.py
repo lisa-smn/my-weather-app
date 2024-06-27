@@ -2,14 +2,13 @@ from flask import Flask, request, jsonify
 import mysql.connector
 import os
 import requests
-from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
 # Datenbankkonfiguration aus Umgebungsvariablen laden
 db_config = {
     'user': os.getenv('DB_USER', 'admin'),
-    'password': os.getenv('DB_PASSWORD', 'your-password'),
+    'password': os.getenv('DB_PASSWORD', 'my-weatther-app-db'),
     'host': os.getenv('DB_HOST', 'my-weather-app-db.cnla9t80uygd.us-east-1.rds.amazonaws.com'),
     'database': os.getenv('DB_NAME', 'weatherdb')
 }
@@ -20,8 +19,9 @@ def get_db_connection():
 def fetch_and_store_weather(city):
     api_key = os.getenv('API_KEY')
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
-    response = requests.get(url)
-    if response.status_code == 200:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
         data = response.json()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -32,6 +32,10 @@ def fetch_and_store_weather(city):
         conn.commit()
         cursor.close()
         conn.close()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather data from API: {e}")
+    except mysql.connector.Error as err:
+        print(f"Error storing weather data to database: {err}")
 
 @app.route('/weather', methods=['GET'])
 def get_weather():
@@ -50,7 +54,4 @@ def add_weather():
     return '', 201
 
 if __name__ == '__main__':
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=fetch_and_store_weather, trigger="interval", seconds=3600, args=['Hamburg'])  # Fetched weather data for Hamburg every hour
-    scheduler.start()
     app.run(host='0.0.0.0', port=5001)
